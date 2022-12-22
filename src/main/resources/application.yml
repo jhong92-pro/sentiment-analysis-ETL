@@ -1,0 +1,27 @@
+logging:
+  level:
+    # hibernate 가 남기는 모든 로그가 debug모드로 설정
+    # jpa hibernate가 생성하는 sql이 로거를 통해서 찍히도록 하는 설정
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+server:
+  port: 8081
+
+spring:
+  kafka:
+    bootstrap-servers:
+      - localhost:19092
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/twitterdashboard?serverTimezone=UTC&characterEncoding=UTF-8
+    username: ENC(6xIdLEN511AW2zQYoJNyPA==)
+    password: ENC(27DU1jFyyYKyDIktI4hh2uVgrI4uLUmc)
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false
+    properties:
+      hibernate:
+#        format_sql: true
+
