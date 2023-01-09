@@ -8,12 +8,12 @@ import org.springframework.web.client.RestTemplate;
 
 public class SeleniumChromeDriver {
 
-    @Value("${web.driver.path}")
-    private static String WEB_DRIVER_PATH;
-    private static WebDriver driver;
+    private static final WebDriver driver;
     static{
         ChromeOptions options = new ChromeOptions();
         String WEB_DRIVER_ID = "webdriver.chrome.driver";
+        //    @Value("${web.driver.path}")
+        String WEB_DRIVER_PATH = "C:\\Users\\Jun Seung Hong\\OneDrive\\바탕 화면\\Coding\\project\\Crawling\\src\\main\\resources\\chromedriver.exe";
         System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
         options.addArguments("headless"); // 크롬 창 띄우지 않음
         driver = new ChromeDriver(options);

@@ -162,8 +162,10 @@ public class IlbeService {
             sentenceList.set(sentenceList.size()-1, crawlResult.getTitle());
         }
 //TODO : body 로직 개선 sentenceList의 가장 뒤가 body, body는 문장에서 word 존재하는지 check에 걸리지 않음
-        body = sentenceList.remove(sentenceList.size()-1);
-
+        if (sentenceList.size()==0){
+            return sentenceList;
+        }
+        body = sentenceList.remove(sentenceList.size() - 1);
         sentenceList =new ArrayList<>(sentenceList.stream()
                 .filter(sentence->{
                     for(String word: wordList){
