@@ -13,9 +13,11 @@ public class SeleniumChromeDriver {
         ChromeOptions options = new ChromeOptions();
         String WEB_DRIVER_ID = "webdriver.chrome.driver";
         //    @Value("${web.driver.path}")
-        String WEB_DRIVER_PATH = "C:\\Users\\Jun Seung Hong\\OneDrive\\바탕 화면\\Coding\\project\\Crawling\\src\\main\\resources\\chromedriver.exe";
+        String WEB_DRIVER_PATH = "/home/jun/server/crawl-ETL/driver/chromedriver";
         System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
         options.addArguments("headless"); // 크롬 창 띄우지 않음
+        options.addArguments("no-sandbox");
+        options.addArguments("disable-dev-shm-usage");
         driver = new ChromeDriver(options);
     }
     private SeleniumChromeDriver() {
