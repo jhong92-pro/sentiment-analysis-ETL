@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.7.4'
 	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
 	id 'java'
+	id 'war'
 }
 
 group = 'com.example'
@@ -10,6 +11,12 @@ sourceCompatibility = '17'
 
 repositories {
 	mavenCentral()
+}
+
+configurations {
+	all { // log4j2 yml 설정위해
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
 }
 
 dependencies {
@@ -28,9 +35,14 @@ dependencies {
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api'
 	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+bootWar {
+	archiveName("ETL.war")
 }
