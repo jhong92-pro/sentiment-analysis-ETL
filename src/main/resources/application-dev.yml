@@ -1,0 +1,9 @@
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+
+spring:
+  config:
+    activate:
+      on-profile: dev
