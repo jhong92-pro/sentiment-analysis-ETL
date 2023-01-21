@@ -37,7 +37,7 @@ public class SeleniumRequest {
 
             return sentenceList;
         }catch (NoSuchElementException e){
-            return new ArrayList<>();
+            return new ArrayList<>(); // 404 Not Found
         }
     }
 }
