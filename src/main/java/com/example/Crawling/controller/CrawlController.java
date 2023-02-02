@@ -18,6 +18,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class CrawlController {
+    // This class is not used, 관리자 기능 만들 때 필요
+    
     private final IlbeService ilbeService;
 
     @GetMapping("/keyword/{keywordId}")
@@ -37,33 +39,5 @@ public class CrawlController {
         ilbeService.crawlIlbe(ids);
         return null;
     }
-
-    @GetMapping("/sentiment")
-    public void doSentiment() throws Exception {
-        HashMap<Integer, List<String>> sentenceListByDate = new HashMap<>();
-        List<String> sample1 = new ArrayList<>();
-        sample1.add("안녕하세요");
-        sample1.add("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요");
-        sentenceListByDate.put(3, new ArrayList<>());
-        List<String> sample2 = new ArrayList<>();
-        sample2.add("안녕히 가세요");
-        sample2.add("안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요");
-        sentenceListByDate.put(4, new ArrayList<>());
-        ilbeService.requestSentiment(sentenceListByDate);
-    }
-
-    @GetMapping("/sentiment/indiv")
-    public SentimentResponse doSentimentIndiv() throws Exception {
-        HashMap<String, List<String>> sentenceListByDate = new HashMap<>();
-        List<String> sample1 = new ArrayList<>();
-        sample1.add("안녕하세요");
-        sample1.add("안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요");
-        sample1.add("안녕히 가세요");
-        sample1.add("안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요안녕히 가세요");
-        sample1.add("abcdefg");
-        sentenceListByDate.put("sentences", new ArrayList<>());
-        return ilbeService.requestSentimentById(sample1);
-    }
-
 
 }

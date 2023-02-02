@@ -2,6 +2,7 @@ package com.example.Crawling.service;
 
 import com.example.Crawling.dao.*;
 import com.example.Crawling.entity.CrawlResult;
+import com.example.Crawling.entity.Keyword;
 import com.example.Crawling.entity.KeywordTag;
 import com.example.Crawling.entity.SentimentPreStage;
 import com.example.Crawling.model.*;
@@ -31,10 +32,10 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Slf4j
 public class IlbeService {
-    public final SentimentPreStageDao sentimentPreStageDao;
-    public final KeywordDao keywordDao;
-    public final KeywordTagDao keywordTagDao;
-    public final CrawlResultDao crawlResultDao;
+    private final SentimentPreStageDao sentimentPreStageDao;
+    private final KeywordDao keywordDao;
+    private final KeywordTagDao keywordTagDao;
+    private final CrawlResultDao crawlResultDao;
 
     private final String baseURL = "http://localhost:8000";
     private final CrawlProducer crawlProducer;
@@ -85,7 +86,7 @@ public class IlbeService {
                 // 감정 하나만 Producer에 넣으면 됨 (sentimentprestageId 중복해서 안 들어가게)
             }
         }
-        if (rowCnt==0){
+        if (rowCnt==0){ // 검색결과없음
             SentimentPreStage sentimentPreStage = SentimentPreStage.builder()
                     .sentimentCode(SentimentCode.NEUTRAL)
                     .total(0)
@@ -125,15 +126,16 @@ public class IlbeService {
     public void crawlIlbe (List<Integer> sentimentPreStageIdList) throws Exception {
         // TODO List <-> CrawlRequest 형 변환 제거 (kafka에서 바로 List<Integer> 전송방법 있을듯함)
         List<SentimentPreStage> sentimentPreStageList = sentimentPreStageDao.findBySentimentPreStageIdIn(sentimentPreStageIdList);
-        List<SentimentPreStage> sentimentPreStageListToSave = new ArrayList<>();
         log.info(Arrays.toString(sentimentPreStageList.toArray()));
         HashMap<Integer, List<String>> sentenceListById = new HashMap<>();
         Integer keywordId = sentimentPreStageList.get(0).getKeywordId();
         List<String> wordList = new ArrayList<>(keywordTagDao.findAllByKeywordId(keywordId).
                 stream().map(KeywordTag::getTagName).toList());
-        wordList.add(keywordDao.findById(keywordId)
+        String keyword
+                = keywordDao.findById(keywordId)
                 .orElseThrow(Exception::new)
-                .getKeyword());
+                .getKeyword();
+        wordList.add(keyword);
 
         for(SentimentPreStage sentimentPreStage:sentimentPreStageList){
 
@@ -147,12 +149,9 @@ public class IlbeService {
 
             sentenceList = filterCrawlResponse(wordList, crawlResult, sentenceList);
 
-//            sentenceList = Stream.concat(sentenceListById.get(crawlResultId).stream(), sentenceList.stream())
-//                    .collect(Collectors.toList()); TODO : sentenceListById 삭제
             sentenceListById.put(crawlResultId,sentenceList); //TODO : sentenceListById 삭제
             SentimentResponse sentimentResponse = requestSentimentById(sentenceList);
             saveSentimentResponse(keywordId, crawlResult, sentimentResponse);
-//            sentimentProducer.async("sentiment", SentimentRequest.builder().sentenceListById(sentenceListById).build());
         }
     }
 
@@ -161,7 +160,7 @@ public class IlbeService {
         if (sentenceList.size()!=0 && sentenceList.get(sentenceList.size()-1).length()<10){
             sentenceList.set(sentenceList.size()-1, crawlResult.getTitle());
         }
-//TODO : body 로직 개선 sentenceList의 가장 뒤가 body, body는 문장에서 word 존재하는지 check에 걸리지 않음
+        //TODO : body 로직 개선 sentenceList의 가장 뒤가 body, body는 문장에서 word 존재하는지 check에 걸리지 않음
         if (sentenceList.size()==0){
             return sentenceList;
         }
@@ -206,26 +205,8 @@ public class IlbeService {
         return crawlResultDao.findAll(spec);
     }
 
+    // not used 감정분석 kafka topic 따로 있으면 쓸 수도 있음
     public SentimentResponse requestSentiment(HashMap<Integer, List<String>> sentenceListById) throws JsonProcessingException {
-
-        RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        ResponseEntity<Object> result = null;
-        HttpEntity<String> requestEnty = null;
-
-        Map<String, Object> responseData = new HashMap<>();
-        String reqBodyData = null;
-//
-//        for (Map.Entry<String, ArrayList<String>> entry : bodySentenceByDate.entrySet()) {
-//            String YYYY_MM_DD = entry.getKey();
-//            ArrayList<String> sentences = entry.getValue();
-//            bodyParamMap.put("sentences", sentences);
-//            reqBodyData = new ObjectMapper().writeValueAsString(bodyParamMap);
-//            requestEnty = new HttpEntity<>(reqBodyData, headers);
-//            result = restTemplate.postForEntity(url, requestEnty, Object.class);
-//            responseData.put(YYYY_MM_DD, result.getBody().toString());   // Change type to Json or Map, not toString()
-//        }
         RestTemplate sentimentRestTemplate = SentimentRestTemplate.getRestTemplate();
         SentimentResponse sentimentResponse = sentimentRestTemplate.postForObject(baseURL+"/sentiment/ko", sentenceListById, SentimentResponse.class);
 
@@ -240,14 +221,12 @@ public class IlbeService {
         bodyParamMap.put("sentences", sentenceList);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type","application/json");
-        System.out.println(bodyParamMap);
         String reqBodyData = new ObjectMapper().writeValueAsString(bodyParamMap);
         HttpEntity<String> request = new HttpEntity<>(reqBodyData, headers);
-        log.info("reqest"+request.getBody());
+        log.debug("request : "+request.getBody());
         SentimentResponse sentimentResponse = sentimentRestTemplate.postForObject(baseURL+"/sentiment/ko", request, SentimentResponse.class);
-//        Object response = sentimentRestTemplate.postForEntity(baseURL+"/sentiment/ko", request, Object.class);
-//        return null;
-        log.info(sentimentResponse.toString());
+
+        log.debug(sentimentResponse.toString());
         return sentimentResponse;
     }
 
