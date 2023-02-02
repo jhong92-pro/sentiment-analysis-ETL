@@ -16,16 +16,23 @@ repositories {
 configurations {
 	all { // log4j2 yml 설정위해
 		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+
+		// junit test
+		exclude group: "junit", module : "junit"
+		exclude group: "org.junit.vintage", module: "junit-vintage-engine"
 	}
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.jsoup:jsoup:1.15.3'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
 	implementation 'org.apache.httpcomponents:httpclient:4.5'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.seleniumhq.selenium:selenium-java:4.5.3'
+	testImplementation 'junit:junit:4.13.1'
 	compileOnly 'org.projectlombok:lombok'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.5'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -33,13 +40,12 @@ dependencies {
 	runtimeOnly 'mysql:mysql-connector-java'
 	implementation 'org.springframework.kafka:spring-kafka'
 	testImplementation 'org.springframework.kafka:spring-kafka-test'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+	testImplementation 'org.junit.jupiter:junit-jupiter'
+
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2'
 }
-
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }
 
