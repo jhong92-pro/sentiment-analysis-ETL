@@ -6,6 +6,7 @@ import com.example.Crawling.model.SentimentRequest;
 import com.example.Crawling.service.IlbeService;
 import com.example.Crawling.service.KafkaErrorService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
@@ -33,6 +34,7 @@ import java.util.*;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class KafkaJsonListenerContainerConfiguration {
     private final KafkaErrorService kafkaErrorService;
 
@@ -67,8 +69,9 @@ public class KafkaJsonListenerContainerConfiguration {
         factory.setConsumerFactory(crawlConsumerFactory());
         factory.setRetryTemplate(customizedRetryTemplate());
         factory.setRecoveryCallback(context -> {
+            log.error("consumer retry -" + context.toString());
+            log.error("consumer retry -" + Arrays.toString(context.getLastThrowable().getStackTrace()));
             ConsumerRecord record = (ConsumerRecord) context.getAttribute("record");
-            System.out.println("consumermessage : "+record.value());
             kafkaErrorService.saveError(record);
             return Optional.empty();
         });
@@ -92,30 +95,25 @@ public class KafkaJsonListenerContainerConfiguration {
     }
 
     // SentimentKafkaRequest Configuration
+    // not used
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SentimentRequest>> triggerSentimentContainerFactory(){
         ConcurrentKafkaListenerContainerFactory<String, SentimentRequest> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(sentimentConsumerFactory());
-//        factory.setRetryTemplate(customizedRetryTemplate());
-//        factory.setRecoveryCallback(context -> {
-//            ConsumerRecord record = (ConsumerRecord) context.getAttribute("record");
+        factory.setRetryTemplate(customizedRetryTemplate());
+        factory.setRecoveryCallback(context -> {
+            ConsumerRecord record = (ConsumerRecord) context.getAttribute("record");
 //            System.out.println("consumermessage : "+record.value());
-//            return Optional.empty();
-//        });
+            return Optional.empty();
+        });
         return factory;
     }
 
-//    @Bean
-//    DefaultErrorHandler eh() {
-//        return new DefaultErrorHandler((rec, ex) -> {
-//            System.out.println("Recovered: " + rec);
-//        }, new FixedBackOff(1_000L, 3L));
-//    }
-
     private RetryTemplate customizedRetryTemplate() {
         return new RetryTemplateBuilder()
-                .fixedBackoff(1_000)
-                .customPolicy(retryPolicy())
+                .fixedBackoff(1_000L)
+//                .customPolicy(retryPolicy())
+                .maxAttempts(3)
                 .build();
     }
 
