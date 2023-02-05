@@ -1,6 +1,7 @@
 # sentiment-analysis-ETL
 
-![plantUML](https://user-images.githubusercontent.com/68533862/216350835-e09ff4b8-c1ad-4049-a5d7-f7ced8ebb082.png)
+![NOwzJiGm48HxFyMKKEG5A2BnGu54HP0eJbUid055vpX7rZvqRy_QYIL4YjZQx_FiY4_B2cJbwbpve-lnSJ_W3c_ypjI4nrL-WZDnkaXYXTldohKp__dzzP-EcvDydkHsK_gQNoFrl4Gb3XL36KSCsNkg7jt8lqiSOvhI5IynSOrCBYpB6H82PhFbY](https://user-images.githubusercontent.com/68533862/216820580-6874d21c-7e6a-437a-a6d7-3f68b033cbe1.png)
+
 <details>
 <summary>plantUML</summary>
 <div markdown="1">
@@ -20,6 +21,7 @@ loop all message consumed
   Internet ->ETL: crawl Response
   ETL->Sentiment : sentence
   Sentiment ->ETL : sentiment analysis result
+  ETL -> ETL : save result [DB]
 end
 @enduml
 ```
