@@ -1,6 +1,6 @@
 # sentiment-analysis-ETL
 
-![NOwzJiGm48HxFyMKKEG5A2BnGu54HP0eJbUid055vpX7rZvqRy_QYIL4YjZQx_FiY4_B2cJbwbpve-lnSJ_W3c_ypjI4nrL-WZDnkaXYXTldohKp__dzzP-EcvDydkHsK_gQNoFrl4Gb3XL36KSCsNkg7jt8lqiSOvhI5IynSOrCBYpB6H82PhFbY](https://user-images.githubusercontent.com/68533862/216820580-6874d21c-7e6a-437a-a6d7-3f68b033cbe1.png)
+![PO-nJWCn38PtFuL76Eu564u5mO1WeaWCLGShCUZKn2cnq-hUdkJkWf38u4J-Vl-_irEZR2K686Sf8nRb3D0g3YD-tE_n3j_ukx0Qll1yJTatwNGXumMl1zfpg1DFxw__1l3cH9ydkbr5uvAnsEevYJ8U5epAud5Vd6FL8tZ-6mCiDjcCpsASXGr2IcUa431MDNqnkYHQ8dl](https://user-images.githubusercontent.com/68533862/216821372-67c37c5d-254b-4cad-be61-040ec5088784.png)
 
 <details>
 <summary>plantUML</summary>
@@ -10,9 +10,9 @@
 @startuml
 actor  user
 
-user -> WAS : Request Crawl
+user -> WAS : Request Keyword
 activate WAS       
-WAS --> ETL: Request Crawl (kafka)
+WAS --> ETL: Request Keyword (kafka)
 WAS -> user : Response [kafka send Success]
 deactivate WAS
 entity Internet
@@ -27,3 +27,19 @@ end
 ```
 </div>
 </details>
+  
+  
+
+
+# Server
+[Front](https://github.com/jhong92-pro/sentiment-front) : vanillaJS  
+[WAS](https://github.com/jhong92-pro/sentiment-was) : Springboot, kafka  
+ETL : Springboot, kafka  
+[NLP](https://github.com/jhong92-pro/sentiment-backend) : FastAPI, NLP  
+[Batch](https://github.com/jhong92-pro/sentiment-crawl-batch) : Spring-batch (crawl website addresses)  
+
+# ISSUE
+```
+Session ID: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  
+Caused by: org.openqa.selenium.NoSuchSessionException: invalid session id
+```
